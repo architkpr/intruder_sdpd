@@ -13,7 +13,7 @@ public class Alarm extends BroadcastReceiver
     public void onReceive(Context context, Intent intent)               // To be executed whenever alarm is fired
     {
         // Task to be done when alarm is fired
-        MediaPlayer mediaPlayer = MediaPlayer.create(context, Settings.System.DEFAULT_NOTIFICATION_URI);
+        MediaPlayer mediaPlayer = MediaPlayer.create(context, Settings.System.DEFAULT_ALARM_ALERT_URI);
         mediaPlayer.start();
     }
 }
