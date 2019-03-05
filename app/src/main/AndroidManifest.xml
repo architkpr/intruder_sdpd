@@ -16,6 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".clock1"></activity>
+
+        <receiver android:name=".Alarm"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>
