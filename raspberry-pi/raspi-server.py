@@ -36,7 +36,7 @@ def runServer(server_ip, server_port, server_no):
             esp32a_data_list.append(int(rssi_value.rstrip('\x00')))
             # print(esp32a_data_list)
         else:
-            esp32b_data_list.append(rssi_value)
+            esp32b_data_list.append(int(rssi_value.rstrip('\x00')))
 
         # Reply acknowledgement to ESP32
         conn.send(b'1')
