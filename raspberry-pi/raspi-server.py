@@ -180,7 +180,7 @@ def displayList(data_list, server_no, intruder_firebase):
         current_time = datetime.datetime.now()
         current_time_1 = str(current_time)
 
-        intruder_firebase.put('timelog', 'time for ' + str(count), 'intruder detected on ESP : ' + str(server_no + 'at time ' + current_time_1))
+        intruder_firebase.put('timelog', 'time for ' + str(count), 'intruder detected on ESP : ' + str(server_no) + 'at time ' + current_time_1)
 
     # plt.plot(data_list)
     # plt.plot(variance1, color='red')
