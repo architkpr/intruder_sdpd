@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 import copy
+import time
 from firebase import firebase
 
 # Lists to store data received by ESP32s
@@ -37,7 +38,7 @@ def runServer(server_ip, server_port, server_no):
 
         # Check if in Detection Period
         if begin_system is 1:
-            # print("Began System on Server")
+            print("Began System on Server")
             # Data received is a string of the form - '-25\x00\x00\...'
             # Split data to store only RSSI information
             if server_no is 1:
@@ -71,14 +72,14 @@ def pollFirebase():
         if int(result) == 1:
             # Detection Period begins
             begin_system = 1
-            print("Beginning Detection Period")
+            # print("Beginning Detection Period")
             # Clear all data lists
             esp32a_data_list.clear()
             esp32b_data_list.clear()
 
         else:
             # Detection Period ends
-            print("Ending Detection Period")
+            # print("Ending Detection Period")
             begin_system = 0
 
 
@@ -100,14 +101,19 @@ def setup():
     server_B = threading.Thread(target=runServer, args=(server_ip, server_port_2, 2, ))
     server_B.start()
 
+    time.sleep(1)
+    # begin_system = 1
     # Send data lists in windows of 100 elements
     while begin_system:
-
+        # print("Size: {}".format(len(esp32a_data_list)))
         if len(esp32a_data_list) == 100:
+            print("I am inside")
+            print("Size: {}".format(len(esp32a_data_list)))
             data_list = copy.deepcopy(esp32a_data_list)
             esp32a_data_list.clear()
             sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
             sig_prog_A.start()
+            print("Thread started")
 
         if len(esp32b_data_list) == 100:
             data_list = copy.deepcopy(esp32b_data_list)
@@ -122,8 +128,8 @@ def displayList(data_list, server_no):
     """
     print("\nSignal Processing Function begins here\n")
     print("Data received from {}: {}".format(server_no, data_list))
-    sys.exit()
-    print("THREAD NOT AVAILABLE")
+    # sys.exit()
+    # print("THREAD NOT AVAILABLE")
 
     # # connect to firebase
 
