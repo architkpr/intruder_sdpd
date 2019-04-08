@@ -3,6 +3,7 @@ import threading
 # import sys
 import copy
 import time
+import datetime
 import numpy as np
 from firebase import firebase
 
@@ -78,8 +79,9 @@ def pollFirebase(intruder_firebase):
         if int(result) == 1:
             # Detection Period begins
             begin_system = 1
-            # print("Beginning Detection Period")
+
             if first_time:
+                print("Beginning Detection Period")
                 # Clear all data lists
                 esp32a_data_list.clear()
                 esp32b_data_list.clear()
@@ -113,10 +115,10 @@ def setup():
 
     time.sleep(1)
     # begin_system = 1
-    # Send data lists in windows of 100 elements
+    # Send data lists in windows of 1000 elements
     while True:
         # print("Size: {}".format(len(esp32a_data_list)))
-        if len(esp32a_data_list) == 100:
+        if len(esp32a_data_list) == 1000:
             print("I am inside")
             print("Size: {}".format(len(esp32a_data_list)))
             data_list = copy.deepcopy(esp32a_data_list)
@@ -126,7 +128,7 @@ def setup():
             print("Thread started")
             print("Size: {}".format(len(esp32a_data_list)))
 
-        if len(esp32b_data_list) == 100:
+        if len(esp32b_data_list) == 1000:
             data_list = copy.deepcopy(esp32b_data_list)
             esp32b_data_list.clear()
             sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, intruder_firebase, ))
@@ -142,6 +144,8 @@ def displayList(data_list, server_no, intruder_firebase):
     Signal Processing Function
     """
 
+    print("\n Values obtained from ESP {} : \n {}".format(server_no, data_list))
+
     num = 100
     alert_sum = 0
 
@@ -154,7 +158,7 @@ def displayList(data_list, server_no, intruder_firebase):
     # print('variance', np.var(data_list))
 
     for i in range(90):
-        print(np.var(data_list[i:i + 10]))
+        # print(np.var(data_list[i:i + 10]))
         variance1[i] = np.var(data_list[i:i + 10])
 
     for i in range(80):
@@ -172,8 +176,9 @@ def displayList(data_list, server_no, intruder_firebase):
         else:
             alert[i] = 0
 
-    if (alert_sum / 5 > 3):
-        intruder_firebase.put('timelog', '<insert time here>', 'intruder detected on ESP : ' + str(server_no))
+    if (alert_sum / 5 > 8):
+        current_time = datetime.datetime.now()
+        intruder_firebase.put('timelog', str(current_time), 'intruder detected on ESP : ' + str(server_no))
 
     # plt.plot(data_list)
     # plt.plot(variance1, color='red')
