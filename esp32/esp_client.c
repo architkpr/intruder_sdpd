@@ -171,7 +171,7 @@ static void tcp_client_task(void *pvParameters)
                 ESP_LOGI(TAG, "%s", rx_buffer);
             }
 
-            vTaskDelay(50);
+            vTaskDelay(5);
         }
 
         if (sock != -1) {
