@@ -1,9 +1,11 @@
 import socket
 import threading
-import sys
+# import sys
 import copy
 import time
+import numpy as np
 from firebase import firebase
+
 
 # Lists to store data received by ESP32s
 # Declare more lists if more ESP32s used
@@ -135,17 +137,46 @@ def displayList(data_list, server_no):
     """
     Signal Processing Function
     """
-    print("\nSignal Processing Function begins here\n")
-    print("Data received from {}: {}".format(server_no, data_list))
-    # sys.exit()
-    # print("THREAD NOT AVAILABLE")
 
-    # # connect to firebase
+    num = 100
+    alert_sum = 0
 
-    # # write value to timelog
-    # resultPut = myfirebase.put('timelog', '10:40', 'no intruderrrrr')
+    variance1 = [0 for x in range(num)]
+    variance2 = [0 for x in range(num)]
+    variance3 = [0 for x in range(num)]
+    alert = [0 for x in range(num)]
 
-    # print(result)
+    print(np.mean(data_list))
+    print('variance', np.var(data_list))
+
+    for i in range(90):
+        print(np.var(data_list[i:i + 10]))
+        variance1[i] = np.var(data_list[i:i + 10])
+
+    for i in range(80):
+        variance2[i] = np.var(data_list[i:i + 20])
+
+    for i in range(95):
+        variance3[i] = np.var(data_list[i:i + 5])
+
+    for i in range(80):
+        if variance1[i]:
+            if (variance3[i] / (2 * variance2[i]) > 1):
+                alert[i] = 5
+                alert_sum += alert[i]
+
+        else:
+            alert[i] = 0
+
+    if (alert_sum / 5 > 3):
+        firebase.put('timelog', '<insert time here>', 'intruder detected on ESP : ' + str(server_no))
+
+    # plt.plot(data_list)
+    # plt.plot(variance1, color='red')
+    # plt.plot(alert,  color='green')
+    # plt.plot(variance3, color='blue')
+    # plt.plot(variance2, color='yellow')
+    # plt.show()
 
 
 if __name__ == "__main__":
