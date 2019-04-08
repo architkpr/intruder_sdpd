@@ -4,7 +4,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -19,6 +21,7 @@ public class activity2 extends AppCompatActivity {
 
     private ListView mListView;
     private ArrayList<String> array = new ArrayList<>();
+    private Button mclear;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("timelog");
 
@@ -31,6 +34,7 @@ public class activity2 extends AppCompatActivity {
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
         mListView.setAdapter(arrayAdapter);
 
+        mclear = findViewById(R.id.clear);
 
 
         myRef.addChildEventListener(new ChildEventListener() {
@@ -63,5 +67,17 @@ public class activity2 extends AppCompatActivity {
 
             }
         });
+
+        mclear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference myRef2 = FirebaseDatabase.getInstance().getReference("timelog");
+                myRef2.removeValue();
+                array.clear();
+                arrayAdapter.notifyDataSetChanged();
+            }
+        });
+
+
     }
 }
