@@ -177,13 +177,20 @@ def displayList(data_list, server_no, intruder_firebase):
             alert[i] = 0
 
     if (alert_sum / 5 > 3):
+
+        # store current time details
         current_time_hour = time.strftime("%H")
         current_time_min = time.strftime("%M")
         current_time_sec = time.strftime("%S")
-        current_date = time.strftime("%D")
+
+        # store current date details
+        current_year = time.strftime("%y")
+        current_month = time.strftime("%m")
+        current_day = time.strftime("%d")
+
         # intruder_firebase.put('timelog', 'time for ' + str(count), 'intruder detected on ESP : ' + str(server_no) + 'at time ' + current_time_1)
 
-        intruder_firebase.put('timelog', current_date + ' at ' + current_time_hour + ':' + current_time_min + ':' + current_time_sec, 'intruder detected on ESP : ' + str(server_no))
+        intruder_firebase.put('timelog', current_day + '.' + current_month '.' + current_year + ' at ' + current_time_hour + ':' + current_time_min + ':' + current_time_sec, 'intruder detected on ESP : ' + str(server_no))
 
     # plt.plot(data_list)
     # plt.plot(variance1, color='red')
