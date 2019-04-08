@@ -9,8 +9,9 @@ from firebase import firebase
 # Declare more lists if more ESP32s used
 esp32a_data_list = []
 esp32b_data_list = []
-# Flag to set when in Detection Period
+# Flags to set when in Detection Period
 begin_system = 0
+first_time = 1
 
 
 def runServer(server_ip, server_port, server_no):
@@ -60,6 +61,7 @@ def runServer(server_ip, server_port, server_no):
 
 def pollFirebase():
     global begin_system
+    global first_time
 
     # Connect to database at Firebase
     intruder_firebase = firebase.FirebaseApplication('https://intruder-291bc.firebaseio.com/')
@@ -73,9 +75,11 @@ def pollFirebase():
             # Detection Period begins
             begin_system = 1
             # print("Beginning Detection Period")
-            # Clear all data lists
-            esp32a_data_list.clear()
-            esp32b_data_list.clear()
+            if first_time:
+                # Clear all data lists
+                esp32a_data_list.clear()
+                esp32b_data_list.clear()
+                first_time = 0
 
         else:
             # Detection Period ends
