@@ -118,25 +118,21 @@ def setup():
     # Send data lists in windows of 1000 elements
     while True:
         # print("Size: {}".format(len(esp32a_data_list)))
-        if len(esp32a_data_list) == 1000:
-            print("I am inside")
-            print("Size: {}".format(len(esp32a_data_list)))
+        if len(esp32a_data_list) == 100:
+            # print("I am inside")
+            # print("Size: {}".format(len(esp32a_data_list)))
             data_list = copy.deepcopy(esp32a_data_list)
             esp32a_data_list.clear()
             sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, intruder_firebase, ))
             sig_prog_A.start()
-            print("Thread started")
-            print("Size: {}".format(len(esp32a_data_list)))
+            # print("Thread started")
+            # print("Size: {}".format(len(esp32a_data_list)))
 
-        if len(esp32b_data_list) == 1000:
+        if len(esp32b_data_list) == 100:
             data_list = copy.deepcopy(esp32b_data_list)
             esp32b_data_list.clear()
             sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, intruder_firebase, ))
             sig_prog_B.start()
-
-        if len(esp32a_data_list) > 100:
-            print('length has increased!')
-            print("Size: {}".format(len(esp32a_data_list)))
 
 
 def displayList(data_list, server_no, intruder_firebase):
@@ -146,7 +142,7 @@ def displayList(data_list, server_no, intruder_firebase):
 
     print("\n Values obtained from ESP {} : \n {}".format(server_no, data_list))
 
-    num = 100
+    num = len(data_list)
     alert_sum = 0
 
     variance1 = [0 for x in range(num)]
@@ -157,17 +153,17 @@ def displayList(data_list, server_no, intruder_firebase):
     # print(np.mean(data_list))
     # print('variance', np.var(data_list))
 
-    for i in range(90):
+    for i in range(num - 10):
         # print(np.var(data_list[i:i + 10]))
         variance1[i] = np.var(data_list[i:i + 10])
 
-    for i in range(80):
+    for i in range(num - 20):
         variance2[i] = np.var(data_list[i:i + 20])
 
-    for i in range(95):
+    for i in range(num - 5):
         variance3[i] = np.var(data_list[i:i + 5])
 
-    for i in range(80):
+    for i in range(num - 20):
         if variance1[i]:
             if (variance3[i] / (2 * variance2[i]) > 1):
                 alert[i] = 5
@@ -176,7 +172,7 @@ def displayList(data_list, server_no, intruder_firebase):
         else:
             alert[i] = 0
 
-    if (alert_sum / 5 > 8):
+    if (alert_sum / 5 > 3):
         current_time = datetime.datetime.now()
         intruder_firebase.put('timelog', str(current_time), 'intruder detected on ESP : ' + str(server_no))
 
