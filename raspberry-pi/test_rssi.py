@@ -1,4 +1,5 @@
 import socket
+import time
 
 
 def testingRSSI():
@@ -11,6 +12,8 @@ def testingRSSI():
 
     print("connected. \n")
     while True:
+        # Wait for 10ms
+        time.sleep(0.01)
         client.send(b'-50\x00\x00\x00')
         print((client.recv(1024)).decode())
 
