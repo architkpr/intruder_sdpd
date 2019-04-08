@@ -16,6 +16,8 @@ esp32b_data_list = []
 begin_system = 0
 first_time = 1
 
+# firebase counter
+count = 0
 # intruder_firebase
 
 
@@ -139,7 +141,9 @@ def displayList(data_list, server_no, intruder_firebase):
     """
     Signal Processing Function
     """
+    global count
 
+    count = count + 1
     print("\n Values obtained from ESP {} : \n {}".format(server_no, data_list))
 
     num = len(data_list)
@@ -175,7 +179,8 @@ def displayList(data_list, server_no, intruder_firebase):
     if (alert_sum / 5 > 3):
         current_time = datetime.datetime.now()
         current_time = str(current_time)
-        intruder_firebase.put('timelog', '' + current_time, 'intruder detected on ESP : ' + str(server_no))
+
+        intruder_firebase.put('timelog', 'time for ' + str(count), 'intruder detected on ESP : ' + str(server_no))
 
     # plt.plot(data_list)
     # plt.plot(variance1, color='red')
