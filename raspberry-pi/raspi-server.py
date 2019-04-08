@@ -36,7 +36,7 @@ def runServer(server_ip, server_port, server_no):
         rssi_value = (conn.recv(1024)).decode()
 
         # Check if in Detection Period
-        if begin_system == 1:
+        if begin_system is 1:
             # print("Began System on Server")
             # Data received is a string of the form - '-25\x00\x00\...'
             # Split data to store only RSSI information
@@ -57,12 +57,41 @@ def runServer(server_ip, server_port, server_no):
     print("\nServer Closed at {}:{}\n".format(server_ip, server_port))
 
 
+def pollFirebase():
+    global begin_system
+
+    # Connect to database at Firebase
+    intruder_firebase = firebase.FirebaseApplication('https://intruder-291bc.firebaseio.com/')
+    print("Connected to Firebase")
+
+    # Poll Firebase continuously for trigger from user
+    while True:
+        # Read value from 'Start', 'new'
+        result = intruder_firebase.get('Start', 'new')
+        if int(result) == 1:
+            # Detection Period begins
+            begin_system = 1
+            print("Beginning Detection Period")
+            # Clear all data lists
+            esp32a_data_list.clear()
+            esp32b_data_list.clear()
+
+        else:
+            # Detection Period ends
+            print("Ending Detection Period")
+            begin_system = 0
+
+
 def setup():
     global begin_system
 
     server_ip = input("Enter my IP address: ")
     server_port_1 = int(input("Enter port number for server A: "))
     server_port_2 = int(input("Enter port number for server B: "))
+
+    # Connect to Firebase and poll for triggers
+    firebase_thread = threading.Thread(target=pollFirebase)
+    firebase_thread.start()
 
     # Start the servers
     server_A = threading.Thread(target=runServer, args=(server_ip, server_port_1, 1, ))
@@ -71,45 +100,20 @@ def setup():
     server_B = threading.Thread(target=runServer, args=(server_ip, server_port_2, 2, ))
     server_B.start()
 
-    # Connect to Firebase database
-    intruder_firebase = firebase.FirebaseApplication('https://intruder-291bc.firebaseio.com/')
+    # Send data lists in windows of 100 elements
+    while begin_system:
 
-    # Poll Firebase continuously for trigger from user
-    while True:
-        # Read value from 'Start', 'new'
-        result = intruder_firebase.get('Start', 'new')
-        if int(result) == 1:
-            # Detection Period begins
-
-            # Set begin_system = 1
-            begin_system = 1
-            print("Beginning Detection Period")
-            # Clear all data lists
+        if len(esp32a_data_list) == 100:
+            data_list = copy.deepcopy(esp32a_data_list)
             esp32a_data_list.clear()
+            sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
+            sig_prog_A.start()
+
+        if len(esp32b_data_list) == 100:
+            data_list = copy.deepcopy(esp32b_data_list)
             esp32b_data_list.clear()
-
-            # Send data lists in windows of 30 elements
-            while True:
-
-                if len(esp32a_data_list) == 100:
-                    data_list = copy.deepcopy(esp32a_data_list)
-                    esp32a_data_list.clear()
-                    sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
-                    sig_prog_A.start()
-
-                if len(esp32b_data_list) == 100:
-                    data_list = copy.deepcopy(esp32b_data_list)
-                    esp32b_data_list.clear()
-                    sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
-                    sig_prog_B.start()
-
-                result = intruder_firebase.get('Start', 'new')
-                if int(result) == 0:
-                    # Detection Period ends
-
-                    print("Ending Detection Period")
-                    begin_system = 0
-                    break
+            sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
+            sig_prog_B.start()
 
 
 def displayList(data_list, server_no):
