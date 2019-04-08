@@ -23,6 +23,7 @@
         android:layout_width="129dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:onClick="launch_clock"
         android:text="Set End Time" />
 
     <Button

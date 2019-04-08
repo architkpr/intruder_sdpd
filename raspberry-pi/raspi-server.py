@@ -1,11 +1,14 @@
 import socket
 import threading
 import copy
+from firebase import firebase
 
 # Lists to store data received by ESP32s
 # Declare more lists if more ESP32s used
 esp32a_data_list = []
 esp32b_data_list = []
+# Flag to set when in Detection Period
+begin_system = 0
 
 
 def runServer(server_ip, server_port, server_no):
@@ -30,13 +33,16 @@ def runServer(server_ip, server_port, server_no):
     while True:
         rssi_value = (conn.recv(1024)).decode()
 
-        # Data received is a string of the form - '-25\x00\x00\...'
-        # Split data to store only RSSI information
-        if server_no is 1:
-            esp32a_data_list.append(int(rssi_value.rstrip('\x00')))
-            # print(esp32a_data_list)
-        else:
-            esp32b_data_list.append(int(rssi_value.rstrip('\x00')))
+        # Check if in Detection Period
+        if begin_system == 1:
+
+            # Data received is a string of the form - '-25\x00\x00\...'
+            # Split data to store only RSSI information
+            if server_no is 1:
+                esp32a_data_list.append(int(rssi_value.rstrip('\x00')))
+                # print(esp32a_data_list)
+            else:
+                esp32b_data_list.append(int(rssi_value.rstrip('\x00')))
 
         # Reply acknowledgement to ESP32
         conn.send(b'1')
@@ -62,17 +68,45 @@ def setup():
     server_B = threading.Thread(target=runServer, args=(server_ip, server_port_2, 2, ))
     server_B.start()
 
+    # Connect to Firebase database
+    intruder_firebase = firebase.FirebaseApplication('https://intruder-291bc.firebaseio.com/')
+
+    # Poll Firebase continuously for trigger from user
     while True:
-        if len(esp32a_data_list) == 30:
-            data_list = copy.deepcopy(esp32a_data_list)
-            sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
-            sig_prog_A.start()
+        # Read value from 'Start', 'new'
+        result = intruder_firebase.get('Start', 'new')
+        if int(result) == 1:
+            # Detection Period begins
+
+            # Set begin_system = 1
+            begin_system = 1
+            print("Beginning Detection Period")
+            # Clear all data lists
             esp32a_data_list.clear()
-        if len(esp32b_data_list) == 30:
-            data_list = copy.deepcopy(esp32b_data_list)
-            sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
-            sig_prog_B.start()
             esp32b_data_list.clear()
+
+            # Send data lists in windows of 30 elements
+            while True:
+
+                if len(esp32a_data_list) == 30:
+                    data_list = copy.deepcopy(esp32a_data_list)
+                    sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
+                    sig_prog_A.start()
+                    esp32a_data_list.clear()
+
+                if len(esp32b_data_list) == 30:
+                    data_list = copy.deepcopy(esp32b_data_list)
+                    sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
+                    sig_prog_B.start()
+                    esp32b_data_list.clear()
+
+                result = intruder_firebase.get('Start', 'new')
+                if int(result) == 0:
+                    # Detection Period ends
+
+                    print("Ending Detection Period")
+                    begin_system = 0
+                    break
 
 
 def displayList(data_list, server_no):
@@ -81,6 +115,13 @@ def displayList(data_list, server_no):
     """
     print("\nSignal Processing Function begins here\n")
     print("Data received from {}: {}".format(server_no, data_list))
+
+    # # connect to firebase
+
+    # # write value to timelog
+    # resultPut = myfirebase.put('timelog', '10:40', 'no intruderrrrr')
+
+    # print(result)
 
 
 if __name__ == "__main__":
