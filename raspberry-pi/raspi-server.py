@@ -1,5 +1,6 @@
 import socket
 import threading
+import sys
 import copy
 from firebase import firebase
 
@@ -90,17 +91,17 @@ def setup():
             # Send data lists in windows of 30 elements
             while True:
 
-                if len(esp32a_data_list) == 30:
+                if len(esp32a_data_list) == 100:
                     data_list = copy.deepcopy(esp32a_data_list)
+                    esp32a_data_list.clear()
                     sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
                     sig_prog_A.start()
-                    esp32a_data_list.clear()
 
-                if len(esp32b_data_list) == 30:
+                if len(esp32b_data_list) == 100:
                     data_list = copy.deepcopy(esp32b_data_list)
+                    esp32b_data_list.clear()
                     sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
                     sig_prog_B.start()
-                    esp32b_data_list.clear()
 
                 result = intruder_firebase.get('Start', 'new')
                 if int(result) == 0:
@@ -117,6 +118,8 @@ def displayList(data_list, server_no):
     """
     print("\nSignal Processing Function begins here\n")
     print("Data received from {}: {}".format(server_no, data_list))
+    sys.exit()
+    print("THREAD NOT AVAILABLE")
 
     # # connect to firebase
 
