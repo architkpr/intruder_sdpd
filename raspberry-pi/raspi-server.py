@@ -35,12 +35,12 @@ def runServer(server_ip, server_port, server_no):
 
         # Check if in Detection Period
         if begin_system == 1:
-
+            print("Began System on Server")
             # Data received is a string of the form - '-25\x00\x00\...'
             # Split data to store only RSSI information
             if server_no is 1:
                 esp32a_data_list.append(int(rssi_value.rstrip('\x00')))
-                # print(esp32a_data_list)
+                print(esp32a_data_list)
             else:
                 esp32b_data_list.append(int(rssi_value.rstrip('\x00')))
 
