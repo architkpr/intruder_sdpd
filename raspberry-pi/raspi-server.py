@@ -104,22 +104,23 @@ def setup():
     time.sleep(1)
     # begin_system = 1
     # Send data lists in windows of 100 elements
-    while begin_system:
-        # print("Size: {}".format(len(esp32a_data_list)))
-        if len(esp32a_data_list) == 100:
-            print("I am inside")
-            print("Size: {}".format(len(esp32a_data_list)))
-            data_list = copy.deepcopy(esp32a_data_list)
-            esp32a_data_list.clear()
-            sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
-            sig_prog_A.start()
-            print("Thread started")
+    while True:
+        if begin_system:
+            # print("Size: {}".format(len(esp32a_data_list)))
+            if len(esp32a_data_list) == 100:
+                print("I am inside")
+                print("Size: {}".format(len(esp32a_data_list)))
+                data_list = copy.deepcopy(esp32a_data_list)
+                esp32a_data_list.clear()
+                sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
+                sig_prog_A.start()
+                print("Thread started")
 
-        if len(esp32b_data_list) == 100:
-            data_list = copy.deepcopy(esp32b_data_list)
-            esp32b_data_list.clear()
-            sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
-            sig_prog_B.start()
+            if len(esp32b_data_list) == 100:
+                data_list = copy.deepcopy(esp32b_data_list)
+                esp32b_data_list.clear()
+                sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
+                sig_prog_B.start()
 
 
 def displayList(data_list, server_no):
