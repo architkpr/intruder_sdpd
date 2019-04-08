@@ -169,14 +169,15 @@ def displayList(data_list, server_no, intruder_firebase):
 
     for i in range(num - 20):
         if variance1[i]:
-            if (variance3[i] / (2 * variance2[i]) > 1):
+            # if (variance3[i] / (2 * variance2[i]) > 1):
+            if (variance3[i] > 10):
                 alert[i] = 5
                 alert_sum += alert[i]
 
         else:
             alert[i] = 0
 
-    if (alert_sum / 5 > 3):
+    if (alert_sum / 5 > 2):
 
         # store current time details
         current_time_hour = time.strftime("%H")
