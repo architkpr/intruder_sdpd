@@ -191,7 +191,7 @@ def displayList(data_list, server_no, intruder_firebase):
 
         # intruder_firebase.put('timelog', 'time for ' + str(count), 'intruder detected on ESP : ' + str(server_no) + 'at time ' + current_time_1)
 
-        intruder_firebase.put('timelog', 'Entry: ' + str(count), 'At ' + current_time_hour + ':' + current_time_min + ':' + current_time_sec + ' INTRUDER DETECTED AT ESP : ' + str(server_no))
+        intruder_firebase.put('timelog', 'Entry: ' + str(count), 'AT ' + current_time_hour + ':' + current_time_min + ':' + current_time_sec + ' INTRUDER DETECTED AT ESP : ' + str(server_no))
 
     # plt.plot(data_list)
     # plt.plot(variance1, color='red')
