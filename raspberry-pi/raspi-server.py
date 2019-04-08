@@ -38,7 +38,7 @@ def runServer(server_ip, server_port, server_no):
 
         # Check if in Detection Period
         if begin_system is 1:
-            print("Began System on Server")
+            # print("Began System on Server")
             # Data received is a string of the form - '-25\x00\x00\...'
             # Split data to store only RSSI information
             if server_no is 1:
@@ -114,12 +114,17 @@ def setup():
             sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
             sig_prog_A.start()
             print("Thread started")
+            print("Size: {}".format(len(esp32a_data_list)))
 
         if len(esp32b_data_list) == 100:
             data_list = copy.deepcopy(esp32b_data_list)
             esp32b_data_list.clear()
             sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
             sig_prog_B.start()
+
+        if len(esp32a_data_list) > 100:
+            print('length has increased!')
+            print("Size: {}".format(len(esp32a_data_list)))
 
 
 def displayList(data_list, server_no):
