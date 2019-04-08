@@ -174,7 +174,8 @@ def displayList(data_list, server_no, intruder_firebase):
 
     if (alert_sum / 5 > 3):
         current_time = datetime.datetime.now()
-        intruder_firebase.put('timelog', str(current_time), 'intruder detected on ESP : ' + str(server_no))
+        current_time = str(current_time)
+        intruder_firebase.put('timelog', '' + current_time, 'intruder detected on ESP : ' + str(server_no))
 
     # plt.plot(data_list)
     # plt.plot(variance1, color='red')
