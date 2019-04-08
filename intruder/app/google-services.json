@@ -1,0 +1,44 @@
+{
+  "project_info": {
+    "project_number": "763719274335",
+    "firebase_url": "https://intruder-291bc.firebaseio.com",
+    "project_id": "intruder-291bc",
+    "storage_bucket": "intruder-291bc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:763719274335:android:5d837c3a8321ba3a",
+        "android_client_info": {
+          "package_name": "com.example.intruder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "763719274335-htv03hi2rjr195sv73jdt4dgj1okin92.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.intruder",
+            "certificate_hash": "2b904fa09e4354a88cef674b71e7cefb71d1ed2e"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd7StdnsBivz9IQ5gu1NF5RXbfwNriOWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "763719274335-lm6v7n7hq15gg06fqnodpb990bthkn6k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
