@@ -15,6 +15,8 @@ esp32b_data_list = []
 begin_system = 0
 first_time = 1
 
+# intruder_firebase
+
 
 def runServer(server_ip, server_port, server_no):
     global begin_system
@@ -61,13 +63,13 @@ def runServer(server_ip, server_port, server_no):
     print("\nServer Closed at {}:{}\n".format(server_ip, server_port))
 
 
-def pollFirebase():
+def pollFirebase(intruder_firebase):
     global begin_system
     global first_time
 
-    # Connect to database at Firebase
-    intruder_firebase = firebase.FirebaseApplication('https://intruder-291bc.firebaseio.com/')
-    print("Connected to Firebase")
+    # # Connect to database at Firebase
+    # intruder_firebase = firebase.FirebaseApplication('https://intruder-291bc.firebaseio.com/')
+    # print("Connected to Firebase")
 
     # Poll Firebase continuously for trigger from user
     while True:
@@ -96,8 +98,10 @@ def setup():
     server_port_1 = int(input("Enter port number for server A: "))
     server_port_2 = int(input("Enter port number for server B: "))
 
-    # Connect to Firebase and poll for triggers
-    firebase_thread = threading.Thread(target=pollFirebase)
+    # Connect to database at Firebase
+    intruder_firebase = firebase.FirebaseApplication('https://intruder-291bc.firebaseio.com/')
+    print("Connected to Firebase")
+    firebase_thread = threading.Thread(target=pollFirebase, args=(intruder_firebase, ))
     firebase_thread.start()
 
     # Start the servers
@@ -117,7 +121,7 @@ def setup():
             print("Size: {}".format(len(esp32a_data_list)))
             data_list = copy.deepcopy(esp32a_data_list)
             esp32a_data_list.clear()
-            sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, ))
+            sig_prog_A = threading.Thread(target=displayList, args=(data_list, 1, intruder_firebase, ))
             sig_prog_A.start()
             print("Thread started")
             print("Size: {}".format(len(esp32a_data_list)))
@@ -125,7 +129,7 @@ def setup():
         if len(esp32b_data_list) == 100:
             data_list = copy.deepcopy(esp32b_data_list)
             esp32b_data_list.clear()
-            sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, ))
+            sig_prog_B = threading.Thread(target=displayList, args=(data_list, 2, intruder_firebase, ))
             sig_prog_B.start()
 
         if len(esp32a_data_list) > 100:
@@ -133,7 +137,7 @@ def setup():
             print("Size: {}".format(len(esp32a_data_list)))
 
 
-def displayList(data_list, server_no):
+def displayList(data_list, server_no, intruder_firebase):
     """
     Signal Processing Function
     """
@@ -146,8 +150,8 @@ def displayList(data_list, server_no):
     variance3 = [0 for x in range(num)]
     alert = [0 for x in range(num)]
 
-    print(np.mean(data_list))
-    print('variance', np.var(data_list))
+    # print(np.mean(data_list))
+    # print('variance', np.var(data_list))
 
     for i in range(90):
         print(np.var(data_list[i:i + 10]))
@@ -169,7 +173,7 @@ def displayList(data_list, server_no):
             alert[i] = 0
 
     if (alert_sum / 5 > 3):
-        firebase.put('timelog', '<insert time here>', 'intruder detected on ESP : ' + str(server_no))
+        intruder_firebase.put('timelog', '<insert time here>', 'intruder detected on ESP : ' + str(server_no))
 
     # plt.plot(data_list)
     # plt.plot(variance1, color='red')
