@@ -12,6 +12,7 @@ begin_system = 0
 
 
 def runServer(server_ip, server_port, server_no):
+    global begin_system
     """
     Start a server to receive data from the ESP32 modules
     :param server_ip: IP address of Raspberry PI
@@ -56,6 +57,7 @@ def runServer(server_ip, server_port, server_no):
 
 
 def setup():
+    global begin_system
 
     server_ip = input("Enter my IP address: ")
     server_port_1 = int(input("Enter port number for server A: "))
